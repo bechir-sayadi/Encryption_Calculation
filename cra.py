@@ -30,8 +30,9 @@ def CRA(r_list, m_list, verbose=True):
     r_list = [r1, r2, ..., rk]
     m_list = [m1, m2, ..., mk] (pairwise coprime)
 
-    Returns x such that:
-        x ≡ r_i (mod m_i)  for all i
+    Returns (x, M) such that:
+        x ≡ r_i (mod m_i)
+        M = product of all moduli
     """
 
     k = len(r_list)
@@ -46,7 +47,7 @@ def CRA(r_list, m_list, verbose=True):
         print("=== Chinese Remainder Algorithm ===\n")
         print(f"Initial: x = {x}, M = {M}\n")
 
-    # Step 2 (loop from i = 2 to k)
+    # Step 2
     for i in range(1, k):
         mi = m_list[i]
         ri = r_list[i]
@@ -57,27 +58,22 @@ def CRA(r_list, m_list, verbose=True):
             print(f"Current M = {M}")
             print(f"Next congruence: x ≡ {ri} (mod {mi})")
 
-        # Step 3: compute h = (ri - x) * M^{-1} (mod mi)
         h = ((ri - x) * modinv(M % mi, mi)) % mi
 
         if verbose:
-            print(f"M^{-1} mod {mi} = {modinv(M % mi, mi)}")
+            print(f"M^-1 mod {mi} = {modinv(M % mi, mi)}")
             print(f"h = (ri - x) * M^-1 mod mi = {h}")
 
-        # Step 4: update x
         x = x + h * M
-
-        if verbose:
-            print(f"Updated x = {x}")
-
-        # Step 5: update M
         M = M * mi
 
         if verbose:
+            print(f"Updated x = {x}")
             print(f"Updated M = {M}\n")
 
-    # Step 6: return final x mod M
-    return x % M
+    x = x % M
+    return x, M
+
 
 
 # ----------------------------------------------
@@ -96,9 +92,11 @@ def main():
         r_list.append(r)
         m_list.append(m)
 
-    x = CRA(r_list, m_list, verbose=True)
+    x, M = CRA(r_list, m_list, verbose=True)
+
     print("\n=== Final Result ===")
-    print(f"x = {x}")
+    print(f"x = {x}  (mod {M})")
+
 
 
 if __name__ == "__main__":
